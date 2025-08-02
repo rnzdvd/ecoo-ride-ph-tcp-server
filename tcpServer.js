@@ -7,15 +7,11 @@ const TCP_PORT = 9680;
 const map = new Map();
 // Create a TCP server
 const server = net.createServer((socket) => {
-  console.log(
-    "New device connected:",
-    socket.remoteAddress + ":" + socket.remotePort
-  );
-
   socket.setKeepAlive(true);
 
   // Handle incoming data from devices
   socket.on("data", (data) => {
+    // record the device here
     console.log("Received:", data.toString());
   });
 

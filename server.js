@@ -31,23 +31,38 @@ app.get("/api/scooters/:id", (req, res) => {
 // Lock scooter
 app.post("/api/scooters/lock/:id", (req, res) => {
   const id = parseInt(req.params.id);
-  const success = lockDevice(id);
-  res.json({ success, action: "lock", id });
+  const device = deviceManager.getDeviceById(id);
+  if (device) {
+    const success = lockDevice(id);
+    res.json({ success, action: "lock", id });
+  } else {
+    res.status(404).json({ error: "Device not found" });
+  }
 });
 
 // Unlock scooter
 app.post("/api/scooters/unlock/:id", (req, res) => {
   const id = parseInt(req.params.id);
-  const success = unlockDevice(id);
-  res.json({ success, action: "unlock", id });
+  const device = deviceManager.getDeviceById(id);
+  if (device) {
+    const success = unlockDevice(id);
+    res.json({ success, action: "unlock", id });
+  } else {
+    res.status(404).json({ error: "Device not found" });
+  }
 });
 
 // set the frequency of how often the scooter sends location data
 app.post("/api/scooters/location-frequency/:id", (req, res) => {
   const id = parseInt(req.params.id);
-  const frequency = req.params.frequency;
-  const success = setLocationSentFrequency(id, frequency);
-  res.json({ success, action: "set-location-frequency", id, frequency });
+  const device = deviceManager.getDeviceById(id);
+  if (device) {
+    const frequency = req.query.frequency;
+    const success = setLocationSentFrequency(id, frequency);
+    res.json({ success, action: "set-location-frequency", id, frequency });
+  } else {
+    res.status(404).json({ error: "Device not found" });
+  }
 });
 
 // Start HTTP server
