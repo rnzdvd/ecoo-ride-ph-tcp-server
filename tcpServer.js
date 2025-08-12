@@ -26,7 +26,7 @@ const server = net.createServer((socket) => {
 
   // Handle errors
   socket.on("error", (err) => {
-    console.error("Socket error:", err.message);
+    // console.error("Socket error:", err.message);
   });
 });
 
