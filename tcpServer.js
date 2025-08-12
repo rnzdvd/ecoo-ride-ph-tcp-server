@@ -13,6 +13,7 @@ const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     // record the device here
     console.log("Received:", data.toString());
+    deviceManager.listenDevice(data);
   });
 
   // Handle socket close
