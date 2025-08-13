@@ -13,7 +13,18 @@
 //   },
 
 // Dummy data simulating connected devices
-const devices = [];
+const devices = [
+  {
+    id: 1,
+    name: "Scooter 001",
+    status: "online",
+    battery: 85,
+    location: {
+      lat: 14.55,
+      lng: 121.02,
+    },
+  },
+];
 
 // Function to get all devices
 function getAllDevices() {
