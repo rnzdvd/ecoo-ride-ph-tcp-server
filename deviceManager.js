@@ -20,8 +20,48 @@ const devices = [
     status: "online",
     battery: 85,
     location: {
-      lat: 14.55,
-      lng: 121.02,
+      lat: 7.096222,
+      lng: 125.595869,
+    },
+  },
+  {
+    id: 2,
+    name: "Scooter 002",
+    status: "online",
+    battery: 85,
+    location: {
+      lat: 7.096765,
+      lng: 125.595644,
+    },
+  },
+  {
+    id: 3,
+    name: "Scooter 003",
+    status: "online",
+    battery: 85,
+    location: {
+      lat: 7.097968,
+      lng: 125.596025,
+    },
+  },
+  {
+    id: 4,
+    name: "Scooter 004",
+    status: "online",
+    battery: 85,
+    location: {
+      lat: 7.098751,
+      lng: 125.594335,
+    },
+  },
+  {
+    id: 5,
+    name: "Scooter 005",
+    status: "online",
+    battery: 85,
+    location: {
+      lat: 7.098575,
+      lng: 125.594233,
     },
   },
 ];
