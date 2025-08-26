@@ -7,9 +7,11 @@
 //     status: "online",
 //     battery: 85,
 //     location: {
-//       lat: 14.55,
-//       lng: 121.02,
+//       lat: 7.096222,
+//       lng: 125.595869,
 //     },
+//     socket: null,
+//     lastSeen: null,
 //   },
 
 // Dummy data simulating connected devices
@@ -23,6 +25,8 @@ const devices = [
       lat: 7.096222,
       lng: 125.595869,
     },
+    socket: null,
+    lastSeen: null,
   },
   {
     id: 2,
@@ -33,6 +37,8 @@ const devices = [
       lat: 7.096765,
       lng: 125.595644,
     },
+    socket: null,
+    lastSeen: null,
   },
   {
     id: 3,
@@ -43,6 +49,8 @@ const devices = [
       lat: 7.097968,
       lng: 125.596025,
     },
+    socket: null,
+    lastSeen: null,
   },
   {
     id: 4,
@@ -53,6 +61,8 @@ const devices = [
       lat: 7.098751,
       lng: 125.594335,
     },
+    socket: null,
+    lastSeen: null,
   },
   {
     id: 5,
@@ -63,6 +73,8 @@ const devices = [
       lat: 7.098575,
       lng: 125.594233,
     },
+    socket: null,
+    lastSeen: null,
   },
 ];
 
@@ -96,7 +108,7 @@ function addNewDevice(device) {
   devices.push(device);
 }
 
-function listenDevice(device) {
+function listenDevice(device, socket) {
   // parse data details sent by the device
 
   // take note: this following function need to be added here.

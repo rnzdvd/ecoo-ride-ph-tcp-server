@@ -13,7 +13,7 @@ const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     // record the device here
     console.log("Received:", data.toString());
-    deviceManager.listenDevice(data);
+    deviceManager.listenDevice(data, socket);
   });
 
   // Handle socket close
@@ -26,38 +26,38 @@ const server = net.createServer((socket) => {
 
   // Handle errors
   socket.on("error", (err) => {
-    // console.error("Socket error:", err.message);
+    console.error("Socket error:", err.message);
   });
 });
 
-function lockDevice(deviceId) {
-  // const socket = connectedDevices.get(deviceId);
-  // if (socket) {
-  //   socket.write("LOCK\n"); // adjust to your protocol
-  //   return true;
-  // }
-  console.log("Locking device", deviceId);
-  return true;
+function lockDevice(device) {
+  const socket = device.socket;
+  if (socket) {
+    socket.write("LOCK\n"); // adjust to your protocol
+    return true;
+  }
+  console.log("Locking device", device.name);
+  return false;
 }
 
-function unlockDevice(deviceId) {
-  // const socket = connectedDevices.get(deviceId);
-  // if (socket) {
-  //   socket.write("UNLOCK\n"); // adjust to your protocol
-  //   return true;
-  // }
-  console.log("Unlocking device", deviceId);
-  return true;
+function unlockDevice(device) {
+  const socket = device.socket;
+  if (socket) {
+    socket.write("UNLOCK\n"); // adjust to your protocol
+    return true;
+  }
+  console.log("Unlocking device", device.name);
+  return false;
 }
 
-function setLocationSentFrequency(deviceId, frequency) {
-  // const socket = connectedDevices.get(deviceId);
-  // if (socket) {
-  //   socket.write("LOCATION " + frequency + "\n"); // adjust to your protocol
-  //   return true;
-  // }
-  console.log("Setting location sent frequency", deviceId, frequency);
-  return true;
+function setLocationSentFrequency(device, frequency) {
+  const socket = device.socket;
+  if (socket) {
+    socket.write("LOCATION " + frequency + "\n"); // adjust to your protocol
+    return true;
+  }
+  console.log("Setting location sent frequency", device.name, frequency);
+  return false;
 }
 
 // Start listening

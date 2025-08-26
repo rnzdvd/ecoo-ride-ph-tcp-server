@@ -14,7 +14,8 @@ app.use(express.json());
 // Get all connected scooters/devices
 app.get("/api/scooters", (req, res) => {
   const devices = deviceManager.getAllDevices();
-  res.json(devices);
+  const sanitized = devices.map(({ socket, ...rest }) => rest);
+  res.json(sanitized);
 });
 
 // Get a specific scooter/device
@@ -22,7 +23,8 @@ app.get("/api/scooters/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const device = deviceManager.getDeviceById(id);
   if (device) {
-    res.json(device);
+    const { socket, ...clean } = device;
+    res.json(clean);
   } else {
     res.status(404).json({ error: "Device not found" });
   }
@@ -33,7 +35,7 @@ app.post("/api/scooters/lock/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const device = deviceManager.getDeviceById(id);
   if (device) {
-    lockDevice(id);
+    lockDevice(device);
     res.json({ success: true, action: "lock" });
   } else {
     res.json({ success: false, action: "lock" });
@@ -45,7 +47,7 @@ app.post("/api/scooters/unlock/:id", (req, res) => {
   const id = parseInt(req.params.id);
   const device = deviceManager.getDeviceById(id);
   if (device) {
-    unlockDevice(id);
+    unlockDevice(device);
     res.json({ success: true, action: "unlock" });
   } else {
     res.json({ success: false, action: "unlock" });
@@ -58,7 +60,7 @@ app.post("/api/scooters/location-frequency/:id", (req, res) => {
   const device = deviceManager.getDeviceById(id);
   if (device) {
     const frequency = req.query.frequency;
-    setLocationSentFrequency(id, frequency);
+    setLocationSentFrequency(device, frequency);
     res.json({ success: true, action: "set-location-frequency" });
   } else {
     res.json({ success: false, action: "set-location-frequency" });
