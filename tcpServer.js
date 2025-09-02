@@ -1,6 +1,7 @@
 // tcpServer.js
 const net = require("net");
 const deviceManager = require("./deviceManager");
+const { buildCommand } = require("./scooterCommand");
 
 const TCP_PORT = 9680;
 
@@ -12,51 +13,56 @@ const server = net.createServer((socket) => {
   // Handle incoming data from devices
   socket.on("data", (data) => {
     // record the device here
-    console.log("Received:", data.toString());
     deviceManager.listenDevice(data, socket);
   });
 
   // Handle socket close
   socket.on("end", () => {
-    console.log(
-      "Device disconnected:",
-      socket.remoteAddress + ":" + socket.remotePort
-    );
+    // mark scooter as offline
+    console.log("Device disconnected:", socket);
+    deviceManager.markOffline(socket);
+  });
+
+  socket.on("close", (hadError) => {
+    // mark scooter as offline
+    console.log("Device connection closed. Had error?", hadError);
+    deviceManager.markOffline(socket);
   });
 
   // Handle errors
   socket.on("error", (err) => {
-    console.error("Socket error:", err.message);
+    // mark scooter as offline
+    console.log("Socket error:", err.message);
+    deviceManager.markOffline(socket);
   });
 });
 
-function lockDevice(device) {
+async function lockDevice(device) {
   const socket = device.socket;
   if (socket) {
-    socket.write("LOCK\n"); // adjust to your protocol
+    socket.write(buildCommand(device.id, "R0"));
     return true;
   }
-  console.log("Locking device", device.name);
+
   return false;
 }
 
-function unlockDevice(device) {
+async function unlockDevice(device) {
   const socket = device.socket;
+
   if (socket) {
-    socket.write("UNLOCK\n"); // adjust to your protocol
+    socket.write(buildCommand(device.id, "R0"));
     return true;
   }
-  console.log("Unlocking device", device.name);
   return false;
 }
 
 function setLocationSentFrequency(device, frequency) {
   const socket = device.socket;
   if (socket) {
-    socket.write("LOCATION " + frequency + "\n"); // adjust to your protocol
+    socket.write(buildCommand(device.id, "D1", frequency));
     return true;
   }
-  console.log("Setting location sent frequency", device.name, frequency);
   return false;
 }
 

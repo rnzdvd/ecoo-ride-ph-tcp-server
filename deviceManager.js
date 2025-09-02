@@ -88,6 +88,10 @@ function getDeviceById(id) {
   return devices.find((device) => device.id === id);
 }
 
+function getDeviceBySocket(socket) {
+  return devices.find((d) => d.socket === socket);
+}
+
 // Function to simulate updating a device (e.g. from TCP data)
 function updateDevice(id, newData) {
   const device = devices.find((d) => d.id === id);
@@ -108,19 +112,32 @@ function addNewDevice(device) {
   devices.push(device);
 }
 
-function listenDevice(device, socket) {
+function markOffline(socket) {
+  const device = getDeviceBySocket(socket);
+  if (device) {
+    device.status = "offline";
+    device.socket = null;
+    console.log(`Scooter ${device.name} is now offline.`);
+  }
+}
+
+function listenDevice(deviceData, socket) {
   // parse data details sent by the device
+
+  // take note: when updating a device location or details always update also the socket & lastSeen
 
   // take note: this following function need to be added here.
   // add new device to the list
   // update location on existing device
   // update details on existing device
 
-  console.log("device details", device);
+  console.log("device details", deviceData);
+  console.log("socket details", socket);
 }
 
 module.exports = {
   getAllDevices,
   getDeviceById,
   listenDevice,
+  markOffline,
 };
