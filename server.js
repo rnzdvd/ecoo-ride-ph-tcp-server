@@ -1,7 +1,10 @@
 const express = require("express");
 const deviceManager = require("./deviceManager");
-const { lockDevice, unlockDevice, setLocationSentFrequency } =
-  require("./tcpServer").default;
+const {
+  lockDevice,
+  unlockDevice,
+  setLocationSentFrequency,
+} = require("./tcpServer");
 
 const app = express();
 const port = 30001;
@@ -25,6 +28,30 @@ app.get("/api/scooters/:id", (req, res) => {
   } else {
     res.status(404).json({ error: "Device not found" });
   }
+});
+
+app.post("/api/get-scooters-location", (req, res) => {
+  const ids = req.body.ids; // Expecting { "ids": [1, 2, 3] }
+  // Basic validation
+  if (!Array.isArray(ids) || ids.some((id) => isNaN(id))) {
+    return res
+      .status(400)
+      .json({ error: "Invalid IDs. Must be an array of numbers." });
+  }
+  const devices = [];
+  for (const id of ids) {
+    const device = deviceManager.getDeviceById(id);
+    if (device) {
+      devices.push({
+        id: device.id,
+        lat: device.location.lat,
+        lng: device.location.lng,
+      });
+    }
+  }
+
+  // Process the IDs (e.g., fetch users from database)
+  return res.json(devices);
 });
 
 // Lock scooter
