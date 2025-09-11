@@ -113,11 +113,13 @@ function addNewDevice(device) {
 }
 
 function markOffline(socket) {
-  const device = getDeviceBySocket(socket);
-  if (device) {
+  if (socket) {
+    const device = getDeviceBySocket(socket);
     device.status = "offline";
     device.socket = null;
     console.log(`Scooter ${device.name} is now offline.`);
+  } else {
+    console.log(`The socket of the scooter is null,`);
   }
 }
 
@@ -130,9 +132,10 @@ function listenDevice(deviceData, socket) {
   // add new device to the list
   // update location on existing device
   // update details on existing device
+  // set the status as online automatically
 
-  console.log("device details", deviceData);
-  console.log("socket details", socket);
+  console.log("Device Details:", deviceData);
+  console.log("Socket details:", socket);
 }
 
 module.exports = {

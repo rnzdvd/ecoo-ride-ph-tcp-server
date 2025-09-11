@@ -5,7 +5,20 @@ const { buildCommand } = require("./scooterCommand");
 
 const TCP_PORT = 9680;
 
-const map = new Map();
+// Heartbeat watchdog
+const OFFLINE_THRESHOLD = 60000;
+
+setInterval(() => {
+  const now = Date.now();
+
+  deviceManager.getAllDevices().forEach((d) => {
+    if (d.status === "online" && now - d.lastSeen > OFFLINE_THRESHOLD) {
+      deviceManager.markOffline(d.socket);
+      console.log(`Device ${d.id} marked offline (no updates > 1 min)`);
+    }
+  });
+}, 10000); // check every 10s
+
 // Create a TCP server
 const server = net.createServer((socket) => {
   socket.setKeepAlive(true);
@@ -40,6 +53,7 @@ const server = net.createServer((socket) => {
 async function lockDevice(device) {
   const socket = device.socket;
   if (socket) {
+    socket.write(buildCommand(device.id, "D1", "60"));
     socket.write(buildCommand(device.id, "R0"));
     return true;
   }
@@ -51,6 +65,7 @@ async function unlockDevice(device) {
   const socket = device.socket;
 
   if (socket) {
+    socket.write(buildCommand(device.id, "D1", "6"));
     socket.write(buildCommand(device.id, "R0"));
     return true;
   }
