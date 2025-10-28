@@ -19,14 +19,24 @@ setInterval(() => {
 }, 10000); // check every 10s
 
 setInterval(() => {
-  console.log("requesting location from all devices and battery level");
-  deviceManager.getAllDevices().forEach((d, i) => {
+  const devices = deviceManager.getAllDevices();
+  const totalDevices = devices.length;
+  const totalInterval = 30000; // 30 seconds total cycle
+  const delayPerDevice = totalInterval / totalDevices;
+
+  console.log(
+    `Sending commands to ${totalDevices} devices (every ${delayPerDevice.toFixed(
+      0
+    )} ms)`
+  );
+
+  devices.forEach((d, i) => {
     setTimeout(() => {
       if (d.socket) {
-        d.socket.write(buildCommand(d.id, "S6")); // battery level
-        d.socket.write(buildCommand(d.id, "D1", "10")); // location
+        d.socket.write(buildCommand(d.id, "S6")); // Battery level
+        d.socket.write(buildCommand(d.id, "D1", "10")); // Location update
       }
-    }, i * 500); // send every 0.5 sec to each device
+    }, i * delayPerDevice);
   });
 }, 30000);
 
