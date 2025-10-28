@@ -1,9 +1,12 @@
-function buildCommand(imei, instructionType, payload = "000") {
+function buildCommand(imei, instructionType, payload) {
   const vendorCode = "OM"; // Usually fixed per device/manufacturer
-
+  var body = "";
   // Build ASCII body
-  const body = `*SCOS,${vendorCode},${imei},${instructionType},${payload}#`;
-
+  if (payload) {
+    body = `*SCOS,${vendorCode},${imei},${instructionType},${payload}#`;
+  } else {
+    body = `*SCOS,${vendorCode},${imei},${instructionType}#`;
+  }
   // Build final packet: FF FF (header) + body + newline
   const header = Buffer.from([0xff, 0xff]);
   const bodyBuffer = Buffer.from(body + "\n", "ascii");

@@ -23,7 +23,7 @@ setInterval(() => {
   console.log("requesting location from all devices and battery level");
   deviceManager.getAllDevices().forEach((d) => {
     if (d.socket) {
-      d.socket.write(buildCommand(d.id, "Q0"));
+      d.socket.write(buildCommand(d.id, "S6"));
       d.socket.write(buildCommand(d.id, "D1", "10"));
     }
   });
