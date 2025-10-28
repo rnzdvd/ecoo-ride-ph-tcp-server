@@ -20,7 +20,7 @@ app.get("/api/scooters", (req, res) => {
 
 // Get a specific scooter/device
 app.get("/api/scooters/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = req.params.id;
   const device = deviceManager.getDeviceById(id);
   if (device) {
     const { socket, ...clean } = device;
@@ -56,7 +56,7 @@ app.post("/api/get-scooters-location", (req, res) => {
 
 // Lock scooter
 app.post("/api/scooters/lock/:id", async (req, res) => {
-  const id = parseInt(req.params.id, 10);
+  const id = req.params.id;
   const device = deviceManager.getDeviceById(id);
 
   if (!device) {
@@ -80,7 +80,7 @@ app.post("/api/scooters/lock/:id", async (req, res) => {
 
 // Unlock scooter
 app.post("/api/scooters/unlock/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = req.params.id;
   const device = deviceManager.getDeviceById(id);
 
   if (!device) {
@@ -104,7 +104,7 @@ app.post("/api/scooters/unlock/:id", async (req, res) => {
 
 // set the frequency of how often the scooter sends location data
 app.post("/api/scooters/location-frequency/:id", (req, res) => {
-  const id = parseInt(req.params.id);
+  const id = req.params.id;
   const device = deviceManager.getDeviceById(id);
   if (device) {
     const frequency = req.query.frequency;
