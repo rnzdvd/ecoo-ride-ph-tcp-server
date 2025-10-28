@@ -6,6 +6,7 @@ const {
   checkIfDeviceIsExisting,
   convertToDecimalDegrees,
 } = require("./utils");
+const crypto = require("crypto");
 
 // copy this type of format to create a new device
 // Dummy data simulating connected devices
@@ -34,7 +35,8 @@ function getDeviceById(id) {
 }
 
 function getDeviceBySocket(socket) {
-  return devices.find((d) => d.socket === socket);
+  if (!socket || !socket.id) return undefined;
+  return devices.find((d) => d.socketId === socket.id);
 }
 
 // Function to simulate updating a device (e.g. from TCP data)
@@ -52,6 +54,7 @@ function updateDeviceLocation(id, lat, lng, socket, lastSeen) {
     device.location.lng = lng;
     device.socket = socket;
     device.lastSeen = lastSeen;
+    device.socketId = socket.id;
   }
 }
 
@@ -61,6 +64,7 @@ function updateDeviceBattery(id, batteryLevel, socket, lastSeen) {
     device.battery = batteryLevel;
     device.socket = socket;
     device.lastSeen = lastSeen;
+    device.socketId = socket.id;
   }
 }
 
@@ -69,21 +73,29 @@ function addNewDevice(device) {
 }
 
 function markOffline(socket) {
-  if (socket) {
-    const device = getDeviceBySocket(socket);
-    device.status = "offline";
-    device.socket = null;
-    console.log(`Scooter ${device.name} is now offline.`);
-  } else {
-    console.log(`The socket of the scooter is null,`);
+  if (!socket) {
+    console.log("markOffline called with no socket");
+    return;
   }
+  const device = getDeviceBySocket(socket);
+
+  if (!device) {
+    console.log(`No matching device found for socket`);
+    return; // prevents TypeError crash
+  }
+
+  // safely mark as offline
+  device.status = "offline";
+  device.lastSeen = Date.now();
+  device.socket = null;
+  device.socketId = null;
+
+  console.log(`🟡 Device ${device.name || device.id} marked offline`);
 }
 
 function listenDevice(deviceData, socket) {
   // parse data details sent by the device
-
   // take note: when updating a device location or details always update also the socket & lastSeen
-
   // take note: this following function need to be added here.
   // add new device to the list
   // update location on existing device
@@ -94,6 +106,12 @@ function listenDevice(deviceData, socket) {
   const command = deviceDetails.split(",")[3];
   console.log("Device Details:", deviceDetails);
 
+  // Ensure socket has a UUID
+  if (!socket.id) {
+    socket.id = crypto.randomUUID();
+    console.log(`Assigned socket ID for ${deviceId}: ${socket.id}`);
+  }
+
   if (command === "L5") {
     const newDevice = {};
     if (!checkIfDeviceIsExisting(devices, deviceId)) {
@@ -103,6 +121,7 @@ function listenDevice(deviceData, socket) {
       newDevice.socket = socket;
       newDevice.lastSeen = Date.now();
       newDevice.battery = null;
+      newDevice.socketId = socket.id;
       newDevice.location = {
         lat: null,
         lng: null,
@@ -114,6 +133,7 @@ function listenDevice(deviceData, socket) {
       device.status = "online";
       device.socket = socket;
       device.lastSeen = Date.now();
+      device.socketId = socket.id;
       updateDevice(deviceId, device);
       console.log(`Device ${device.name} is now online.`);
     }

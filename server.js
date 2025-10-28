@@ -23,7 +23,7 @@ app.get("/api/scooters/:id", (req, res) => {
   const id = req.params.id;
   const device = deviceManager.getDeviceById(id);
   if (device) {
-    const { socket, ...clean } = device;
+    const { socket, socketId, lastSeen, ...clean } = device;
     res.json(clean);
   } else {
     res.status(404).json({ error: "Device not found" });

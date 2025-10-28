@@ -6,7 +6,7 @@ const { buildCommand } = require("./scooterCommand");
 const TCP_PORT = 9680;
 
 // Heartbeat watchdog
-const OFFLINE_THRESHOLD = 60000;
+const OFFLINE_THRESHOLD = 60000; // 1 min
 
 setInterval(() => {
   const now = Date.now();
