@@ -1,19 +1,8 @@
 // deviceManager.js
 
-// copy this type of format to create a new device
-//  {
-//     id: 1,
-//     name: "Scooter 001",
-//     status: "online",
-//     battery: 85,
-//     location: {
-//       lat: 7.096222,
-//       lng: 125.595869,
-//     },
-//     socket: null,
-//     lastSeen: null,
-//   },
+const { byteToString } = require("./utils");
 
+// copy this type of format to create a new device
 // Dummy data simulating connected devices
 const devices = [
   {
@@ -134,8 +123,7 @@ function listenDevice(deviceData, socket) {
   // update details on existing device
   // set the status as online automatically
 
-  console.log("Device Details:", deviceData);
-  console.log("Socket details:", socket);
+  console.log("Device Details:", byteToString(deviceData));
 }
 
 module.exports = {
@@ -143,4 +131,5 @@ module.exports = {
   getDeviceById,
   listenDevice,
   markOffline,
+  byteToString,
 };
