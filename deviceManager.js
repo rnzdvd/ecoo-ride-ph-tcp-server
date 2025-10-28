@@ -1,71 +1,23 @@
 // deviceManager.js
 
-const { byteToString } = require("./utils");
+const { buildCommand } = require("./scooterCommand");
+const { byteToString, checkIfDeviceIsExisting } = require("./utils");
 
 // copy this type of format to create a new device
 // Dummy data simulating connected devices
-const devices = [
-  {
-    id: 1,
-    name: "Scooter 001",
-    status: "online",
-    battery: 85,
-    location: {
-      lat: 7.096222,
-      lng: 125.595869,
-    },
-    socket: null,
-    lastSeen: null,
-  },
-  {
-    id: 2,
-    name: "Scooter 002",
-    status: "online",
-    battery: 85,
-    location: {
-      lat: 7.096765,
-      lng: 125.595644,
-    },
-    socket: null,
-    lastSeen: null,
-  },
-  {
-    id: 3,
-    name: "Scooter 003",
-    status: "online",
-    battery: 85,
-    location: {
-      lat: 7.097968,
-      lng: 125.596025,
-    },
-    socket: null,
-    lastSeen: null,
-  },
-  {
-    id: 4,
-    name: "Scooter 004",
-    status: "online",
-    battery: 85,
-    location: {
-      lat: 7.098751,
-      lng: 125.594335,
-    },
-    socket: null,
-    lastSeen: null,
-  },
-  {
-    id: 5,
-    name: "Scooter 005",
-    status: "online",
-    battery: 85,
-    location: {
-      lat: 7.098575,
-      lng: 125.594233,
-    },
-    socket: null,
-    lastSeen: null,
-  },
-];
+
+// id: 1,
+// name: "Scooter 001",
+// status: "online",
+// battery: 85,
+// location: {
+//   lat: 7.096222,
+//   lng: 125.595869,
+// },
+// socket: null,
+// lastSeen: null,
+
+const devices = [];
 
 // Function to get all devices
 function getAllDevices() {
@@ -122,8 +74,34 @@ function listenDevice(deviceData, socket) {
   // update location on existing device
   // update details on existing device
   // set the status as online automatically
+  const deviceDetails = byteToString(deviceData);
+  const deviceId = deviceDetails.split(",")[2];
+  console.log("Device Details:", deviceDetails);
 
-  console.log("Device Details:", byteToString(deviceData));
+  if (deviceDetails.includes("L5")) {
+    const newDevice = {};
+    if (!checkIfDeviceIsExisting(devices, deviceId)) {
+      newDevice.id = deviceId;
+      newDevice.name = `ECOO ${deviceId.slice(-4)}`;
+      newDevice.status = "online";
+      newDevice.socket = socket;
+      newDevice.lastSeen = Date.now();
+      newDevice.battery = null;
+      newDevice.location = {
+        lat: null,
+        lng: null,
+      };
+      addNewDevice(newDevice);
+      console.log(`New device added: ${newDevice}`);
+    } else {
+      const device = getDeviceById(deviceId);
+      device.status = "online";
+      device.socket = socket;
+      device.lastSeen = Date.now();
+      updateDevice(deviceId, device);
+      console.log(`Device ${device.name} is now online.`);
+    }
+  }
 }
 
 module.exports = {
@@ -132,4 +110,6 @@ module.exports = {
   listenDevice,
   markOffline,
   byteToString,
+  buildCommand,
+  checkIfDeviceIsExisting,
 };

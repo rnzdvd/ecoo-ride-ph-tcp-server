@@ -19,6 +19,16 @@ setInterval(() => {
   });
 }, 10000); // check every 10s
 
+setInterval(() => {
+  console.log("requesting location from all devices and battery level");
+  deviceManager.getAllDevices().forEach((d) => {
+    if (d.socket) {
+      d.socket.write(buildCommand(d.id, "Q0"));
+      d.socket.write(buildCommand(d.id, "D1", "10"));
+    }
+  });
+}, 5000);
+
 // Create a TCP server
 const server = net.createServer((socket) => {
   socket.setKeepAlive(true);
