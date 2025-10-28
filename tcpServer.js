@@ -6,11 +6,10 @@ const { buildCommand } = require("./scooterCommand");
 const TCP_PORT = 9680;
 
 // Heartbeat watchdog
-const OFFLINE_THRESHOLD = 60000; // 1 min
+const OFFLINE_THRESHOLD = 180000; // 3 min
 
 setInterval(() => {
   const now = Date.now();
-
   deviceManager.getAllDevices().forEach((d) => {
     if (d.status === "online" && now - d.lastSeen > OFFLINE_THRESHOLD) {
       deviceManager.markOffline(d.socket);
@@ -21,17 +20,20 @@ setInterval(() => {
 
 setInterval(() => {
   console.log("requesting location from all devices and battery level");
-  deviceManager.getAllDevices().forEach((d) => {
-    if (d.socket) {
-      d.socket.write(buildCommand(d.id, "S6"));
-      d.socket.write(buildCommand(d.id, "D1", "10"));
-    }
+  deviceManager.getAllDevices().forEach((d, i) => {
+    setTimeout(() => {
+      if (d.socket) {
+        d.socket.write(buildCommand(d.id, "S6")); // battery level
+        d.socket.write(buildCommand(d.id, "D1", "10")); // location
+      }
+    }, i * 500); // send every 0.5 sec to each device
   });
-}, 5000);
+}, 30000);
 
 // Create a TCP server
 const server = net.createServer((socket) => {
   socket.setKeepAlive(true);
+  socket.setTimeout(300000); // optional: 5-minute idle timeout
 
   // Handle incoming data from devices
   socket.on("data", (data) => {
@@ -57,6 +59,12 @@ const server = net.createServer((socket) => {
     // mark scooter as offline
     console.log("Socket error:", err.message);
     deviceManager.markOffline(socket);
+  });
+
+  socket.on("timeout", () => {
+    console.log(`Socket timeout for ${socket.id}`);
+    deviceManager.markOffline(socket);
+    socket.destroy();
   });
 });
 
