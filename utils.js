@@ -16,26 +16,28 @@ function byteToString(bytes) {
   return buffer.toString("utf8").trim();
 }
 
-function getBatteryPercent(rawVoltage) {
-  // Convert raw value (unit: 0.1V) to actual volts
-  const voltage = rawVoltage * 0.1;
+function convertToDecimalDegrees(latRaw, latHem, lngRaw, lngHem) {
+  // Convert latitude
+  const latDeg = Math.floor(latRaw / 100);
+  const latMin = latRaw % 100;
+  let lat = latDeg + latMin / 60;
+  if (latHem === "S") lat = -lat;
 
-  // Define pack limits (10S Li-ion: 33V empty, 42V full)
-  const minV = 33.0;
-  const maxV = 42.0;
+  // Convert longitude
+  const lngDeg = Math.floor(lngRaw / 100);
+  const lngMin = lngRaw % 100;
+  let lng = lngDeg + lngMin / 60;
+  if (lngHem === "W") lng = -lng;
 
-  // Linear percentage estimate
-  let percent = ((voltage - minV) / (maxV - minV)) * 100;
-
-  // Clamp between 0% and 100%
-  if (percent < 0) percent = 0;
-  if (percent > 100) percent = 100;
-
-  return parseFloat(percent.toFixed(1)); // 1 decimal place
+  return { lat, lng };
 }
 
 function checkIfDeviceIsExisting(devices, id) {
   return devices.find((device) => device.id === id);
 }
 
-module.exports = { byteToString, getBatteryPercent, checkIfDeviceIsExisting };
+module.exports = {
+  byteToString,
+  checkIfDeviceIsExisting,
+  convertToDecimalDegrees,
+};

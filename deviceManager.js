@@ -1,7 +1,11 @@
 // deviceManager.js
 
 const { buildCommand } = require("./scooterCommand");
-const { byteToString, checkIfDeviceIsExisting } = require("./utils");
+const {
+  byteToString,
+  checkIfDeviceIsExisting,
+  convertToDecimalDegrees,
+} = require("./utils");
 
 // copy this type of format to create a new device
 // Dummy data simulating connected devices
@@ -41,11 +45,22 @@ function updateDevice(id, newData) {
   }
 }
 
-function updateDeviceLocation(id, lat, lng) {
+function updateDeviceLocation(id, lat, lng, socket, lastSeen) {
   const device = devices.find((d) => d.id === id);
   if (device) {
     device.location.lat = lat;
     device.location.lng = lng;
+    device.socket = socket;
+    device.lastSeen = lastSeen;
+  }
+}
+
+function updateDeviceBattery(id, batteryLevel, socket, lastSeen) {
+  const device = devices.find((d) => d.id === id);
+  if (device) {
+    device.battery = batteryLevel;
+    device.socket = socket;
+    device.lastSeen = lastSeen;
   }
 }
 
@@ -76,9 +91,10 @@ function listenDevice(deviceData, socket) {
   // set the status as online automatically
   const deviceDetails = byteToString(deviceData);
   const deviceId = deviceDetails.split(",")[2];
+  const command = deviceDetails.split(",")[3];
   console.log("Device Details:", deviceDetails);
 
-  if (deviceDetails.includes("L5")) {
+  if (command === "L5") {
     const newDevice = {};
     if (!checkIfDeviceIsExisting(devices, deviceId)) {
       newDevice.id = deviceId;
@@ -101,6 +117,26 @@ function listenDevice(deviceData, socket) {
       updateDevice(deviceId, device);
       console.log(`Device ${device.name} is now online.`);
     }
+  } else if (command === "D0") {
+    // get device location
+    const deviceDetailsSplited = deviceDetails.split(",");
+    const latRaw = deviceDetailsSplited[7];
+    const latHem = deviceDetailsSplited[8];
+    const lngRaw = deviceDetailsSplited[9];
+    const lngHem = deviceDetailsSplited[10];
+
+    const { lat, lng } = convertToDecimalDegrees(
+      latRaw,
+      latHem,
+      lngRaw,
+      lngHem
+    );
+    updateDeviceLocation(deviceId, lat, lng, socket, Date.now());
+  } else if (command === "S6") {
+    // get battery level
+    const deviceDetailsSplited = deviceDetails.split(",");
+    const batteryLevel = deviceDetailsSplited[4];
+    updateDeviceBattery(deviceId, batteryLevel, socket, Date.now());
   }
 }
 
@@ -112,4 +148,5 @@ module.exports = {
   byteToString,
   buildCommand,
   checkIfDeviceIsExisting,
+  convertToDecimalDegrees,
 };
