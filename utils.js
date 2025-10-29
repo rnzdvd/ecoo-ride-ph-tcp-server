@@ -17,13 +17,15 @@ function byteToString(bytes) {
 }
 
 function convertToDecimalDegrees(latRaw, latHem, lngRaw, lngHem) {
-  // Convert latitude
+  latRaw = parseFloat(latRaw);
+  lngRaw = parseFloat(lngRaw);
+  if (isNaN(latRaw) || isNaN(lngRaw)) return { lat: null, lng: null };
+
   const latDeg = Math.floor(latRaw / 100);
   const latMin = latRaw % 100;
   let lat = latDeg + latMin / 60;
   if (latHem === "S") lat = -lat;
 
-  // Convert longitude
   const lngDeg = Math.floor(lngRaw / 100);
   const lngMin = lngRaw % 100;
   let lng = lngDeg + lngMin / 60;

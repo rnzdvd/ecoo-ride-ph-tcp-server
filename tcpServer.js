@@ -12,8 +12,11 @@ setInterval(() => {
   const now = Date.now();
   deviceManager.getAllDevices().forEach((d) => {
     if (d.status === "online" && now - d.lastSeen > OFFLINE_THRESHOLD) {
+      const minutes = ((now - d.lastSeen) / 60000).toFixed(1);
       deviceManager.markOffline(d.socket);
-      console.log(`Device ${d.id} marked offline (no updates > 1 min)`);
+      console.log(
+        `🟡 Device ${d.id} marked offline (no updates > ${minutes} min)`
+      );
     }
   });
 }, 10000); // check every 10s
@@ -21,6 +24,12 @@ setInterval(() => {
 setInterval(() => {
   const devices = deviceManager.getAllDevices();
   const totalDevices = devices.length;
+
+  if (totalDevices === 0) {
+    console.log("No devices connected, skipping broadcast cycle");
+    return;
+  }
+
   const totalInterval = 30000; // 30 seconds total cycle
   const delayPerDevice = totalInterval / totalDevices;
 
@@ -31,12 +40,13 @@ setInterval(() => {
   );
 
   devices.forEach((d, i) => {
+    const jitter = Math.random() * 500; // 0–0.5s random delay
     setTimeout(() => {
-      if (d.socket) {
+      if (d.socket && d.status === "online") {
         d.socket.write(buildCommand(d.id, "S6")); // Battery level
         d.socket.write(buildCommand(d.id, "D1", "10")); // Location update
       }
-    }, i * delayPerDevice);
+    }, i * delayPerDevice + jitter);
   });
 }, 30000);
 

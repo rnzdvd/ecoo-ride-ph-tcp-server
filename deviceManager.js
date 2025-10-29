@@ -39,14 +39,6 @@ function getDeviceBySocket(socket) {
   return devices.find((d) => d.socketId === socket.id);
 }
 
-// Function to simulate updating a device (e.g. from TCP data)
-function updateDevice(id, newData) {
-  const device = devices.find((d) => d.id === id);
-  if (device) {
-    Object.assign(device, newData);
-  }
-}
-
 function updateDeviceLocation(id, lat, lng, socket, lastSeen) {
   const device = devices.find((d) => d.id === id);
   if (device) {
@@ -113,29 +105,26 @@ function listenDevice(deviceData, socket) {
   }
 
   if (command === "L5") {
-    const newDevice = {};
-    if (!checkIfDeviceIsExisting(devices, deviceId)) {
-      newDevice.id = deviceId;
-      newDevice.name = `ECOO ${deviceId.slice(-4)}`;
-      newDevice.status = "online";
-      newDevice.socket = socket;
-      newDevice.lastSeen = Date.now();
-      newDevice.battery = null;
-      newDevice.socketId = socket.id;
-      newDevice.location = {
-        lat: null,
-        lng: null,
+    const existing = getDeviceById(deviceId);
+    if (!existing) {
+      const newDevice = {
+        id: deviceId,
+        name: `ECOO ${deviceId.slice(-4)}`,
+        status: "online",
+        socket,
+        lastSeen: Date.now(),
+        battery: null,
+        socketId: socket.id,
+        location: { lat: null, lng: null },
       };
       addNewDevice(newDevice);
-      console.log(`New device added: ${newDevice}`);
+      console.log(`🟢 New device added: ${newDevice.name}`);
     } else {
-      const device = getDeviceById(deviceId);
-      device.status = "online";
-      device.socket = socket;
-      device.lastSeen = Date.now();
-      device.socketId = socket.id;
-      updateDevice(deviceId, device);
-      console.log(`Device ${device.name} is now online.`);
+      existing.status = "online";
+      existing.socket = socket;
+      existing.socketId = socket.id;
+      existing.lastSeen = Date.now();
+      console.log(`🔵 Device ${existing.name} reconnected and is now online.`);
     }
   } else if (command === "D0") {
     // get device location
