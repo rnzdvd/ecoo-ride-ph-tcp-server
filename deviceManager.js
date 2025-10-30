@@ -151,7 +151,7 @@ function listenDevice(deviceData, socket) {
     // unlock the command for lock/unlock scooter
     const operationKey = deviceDetails.split(",")[5];
     const userId = deviceDetails.split(",")[6];
-    const timestamp = deviceDetails.split(",")[7];
+    const timestamp = deviceDetails.split(",")[7].slice(0, -1);
     socket.write(
       buildCommand(deviceId, "L0", `${operationKey},${userId},${timestamp}`)
     );
