@@ -92,7 +92,7 @@ async function lockDevice(device) {
   const socket = device.socket;
   if (socket) {
     socket.write(buildCommand(device.id, "D1", "60"));
-    socket.write(buildCommand(device.id, "R0"));
+    socket.write(buildCommand(device.id, `R0,1,20,1234,${Date.now()}`));
     return true;
   }
 
@@ -104,7 +104,7 @@ async function unlockDevice(device) {
 
   if (socket) {
     socket.write(buildCommand(device.id, "D1", "6"));
-    socket.write(buildCommand(device.id, "R0"));
+    socket.write(buildCommand(device.id, `R0,0,20,1234,${Date.now()}`));
     return true;
   }
   return false;
