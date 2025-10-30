@@ -2,6 +2,7 @@
 const net = require("net");
 const deviceManager = require("./deviceManager");
 const { buildCommand } = require("./scooterCommand");
+const { getCurrentTimestamp } = require("./utils");
 
 const TCP_PORT = 9680;
 
@@ -9,7 +10,7 @@ const TCP_PORT = 9680;
 const OFFLINE_THRESHOLD = 180000; // 3 min
 
 setInterval(() => {
-  const now = Date.now();
+  const now = getCurrentTimestamp();
   deviceManager.getAllDevices().forEach((d) => {
     if (d.status === "online" && now - d.lastSeen > OFFLINE_THRESHOLD) {
       const minutes = ((now - d.lastSeen) / 60000).toFixed(1);
@@ -92,7 +93,9 @@ async function lockDevice(device, userId) {
   const socket = device.socket;
   if (socket) {
     socket.write(buildCommand(device.id, "D1", "60"));
-    socket.write(buildCommand(device.id, `R0,1,20,${userId},${Date.now()}`));
+    socket.write(
+      buildCommand(device.id, `R0,1,20,${userId},${getCurrentTimestamp()}`)
+    );
     return true;
   }
 
@@ -104,7 +107,9 @@ async function unlockDevice(device, userId) {
 
   if (socket) {
     socket.write(buildCommand(device.id, "D1", "6"));
-    socket.write(buildCommand(device.id, `R0,0,20,${userId},${Date.now()}`));
+    socket.write(
+      buildCommand(device.id, `R0,0,20,${userId},${getCurrentTimestamp()}`)
+    );
     return true;
   }
   return false;

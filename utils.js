@@ -38,8 +38,13 @@ function checkIfDeviceIsExisting(devices, id) {
   return devices.find((device) => device.id === id);
 }
 
+function getCurrentTimestamp() {
+  return Date.now();
+}
+
 module.exports = {
   byteToString,
   checkIfDeviceIsExisting,
   convertToDecimalDegrees,
+  getCurrentTimestamp,
 };

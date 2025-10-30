@@ -5,6 +5,7 @@ const {
   byteToString,
   checkIfDeviceIsExisting,
   convertToDecimalDegrees,
+  getCurrentTimestamp,
 } = require("./utils");
 const crypto = require("crypto");
 
@@ -78,7 +79,7 @@ function markOffline(socket) {
 
   // safely mark as offline
   device.status = "offline";
-  device.lastSeen = Date.now();
+  device.lastSeen = getCurrentTimestamp();
   device.socket = null;
   device.socketId = null;
 
@@ -112,7 +113,7 @@ function listenDevice(deviceData, socket) {
         name: `ECOO ${deviceId.slice(-4)}`,
         status: "online",
         socket,
-        lastSeen: Date.now(),
+        lastSeen: getCurrentTimestamp(),
         battery: null,
         socketId: socket.id,
         location: { lat: null, lng: null },
@@ -123,7 +124,7 @@ function listenDevice(deviceData, socket) {
       existing.status = "online";
       existing.socket = socket;
       existing.socketId = socket.id;
-      existing.lastSeen = Date.now();
+      existing.lastSeen = getCurrentTimestamp();
       console.log(`🔵 Device ${existing.name} reconnected and is now online.`);
     }
   } else if (command === "D0") {
@@ -140,12 +141,12 @@ function listenDevice(deviceData, socket) {
       lngRaw,
       lngHem
     );
-    updateDeviceLocation(deviceId, lat, lng, socket, Date.now());
+    updateDeviceLocation(deviceId, lat, lng, socket, getCurrentTimestamp());
   } else if (command === "S6") {
     // get battery level
     const deviceDetailsSplited = deviceDetails.split(",");
     const batteryLevel = deviceDetailsSplited[4];
-    updateDeviceBattery(deviceId, batteryLevel, socket, Date.now());
+    updateDeviceBattery(deviceId, batteryLevel, socket, getCurrentTimestamp());
   } else if (command === "R0") {
     // unlock the command for lock/unlock scooter
     const operationKey = deviceDetails.split(",")[5];
@@ -166,4 +167,5 @@ module.exports = {
   buildCommand,
   checkIfDeviceIsExisting,
   convertToDecimalDegrees,
+  getCurrentTimestamp,
 };
