@@ -88,23 +88,23 @@ const server = net.createServer((socket) => {
   });
 });
 
-async function lockDevice(device) {
+async function lockDevice(device, userId) {
   const socket = device.socket;
   if (socket) {
     socket.write(buildCommand(device.id, "D1", "60"));
-    socket.write(buildCommand(device.id, `R0,1,20,1234,${Date.now()}`));
+    socket.write(buildCommand(device.id, `R0,1,20,${userId},${Date.now()}`));
     return true;
   }
 
   return false;
 }
 
-async function unlockDevice(device) {
+async function unlockDevice(device, userId) {
   const socket = device.socket;
 
   if (socket) {
     socket.write(buildCommand(device.id, "D1", "6"));
-    socket.write(buildCommand(device.id, `R0,0,20,1234,${Date.now()}`));
+    socket.write(buildCommand(device.id, `R0,0,20,${userId},${Date.now()}`));
     return true;
   }
   return false;

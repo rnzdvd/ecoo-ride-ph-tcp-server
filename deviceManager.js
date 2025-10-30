@@ -146,6 +146,14 @@ function listenDevice(deviceData, socket) {
     const deviceDetailsSplited = deviceDetails.split(",");
     const batteryLevel = deviceDetailsSplited[4];
     updateDeviceBattery(deviceId, batteryLevel, socket, Date.now());
+  } else if (command === "R0") {
+    // unlock the command for lock/unlock scooter
+    const operationKey = deviceDetails.split(",")[5];
+    const userId = deviceDetails.split(",")[6];
+    const timestamp = deviceDetails.split(",")[7];
+    socket.write(
+      buildCommand(deviceId, "L0", `${operationKey},${userId},${timestamp}`)
+    );
   }
 }
 

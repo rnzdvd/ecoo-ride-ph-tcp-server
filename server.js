@@ -14,7 +14,9 @@ app.use(express.json());
 // Get all connected scooters/devices
 app.get("/api/scooters", (req, res) => {
   const devices = deviceManager.getAllDevices();
-  const sanitized = devices.map(({ socket, ...rest }) => rest);
+  const sanitized = devices.map(
+    ({ socket, socketId, lastSeen, ...rest }) => rest
+  );
   res.json(sanitized);
 });
 
@@ -55,8 +57,9 @@ app.post("/api/get-scooters-location", (req, res) => {
 });
 
 // Lock scooter
-app.post("/api/scooters/lock/:id", async (req, res) => {
+app.post("/api/scooters/lock/:id/:user_id", async (req, res) => {
   const id = req.params.id;
+  const userId = req.params.user_id;
   const device = deviceManager.getDeviceById(id);
 
   if (!device) {
@@ -68,7 +71,7 @@ app.post("/api/scooters/lock/:id", async (req, res) => {
   }
 
   try {
-    const success = await lockDevice(device);
+    const success = await lockDevice(device, userId);
     res.json({ success, action: "lock" });
   } catch (err) {
     console.error("Error locking device:", err);
@@ -79,8 +82,9 @@ app.post("/api/scooters/lock/:id", async (req, res) => {
 });
 
 // Unlock scooter
-app.post("/api/scooters/unlock/:id", async (req, res) => {
+app.post("/api/scooters/unlock/:id/:user_id", async (req, res) => {
   const id = req.params.id;
+  const userId = req.params.user_id;
   const device = deviceManager.getDeviceById(id);
 
   if (!device) {
@@ -92,7 +96,7 @@ app.post("/api/scooters/unlock/:id", async (req, res) => {
   }
 
   try {
-    const success = await unlockDevice(device);
+    const success = await unlockDevice(device, userId);
     res.json({ success, action: "unlock" });
   } catch (err) {
     console.error("Error unlocking device:", err);
