@@ -96,7 +96,6 @@ async function lockDevice(device, userId) {
     socket.write(
       buildCommand(device.id, `R0,1,20,${userId},${getCurrentTimestamp()}`)
     );
-    socket.write(buildCommand(device.id, "L0"));
 
     return true;
   }
@@ -112,7 +111,6 @@ async function unlockDevice(device, userId) {
     socket.write(
       buildCommand(device.id, `R0,0,20,${userId},${getCurrentTimestamp()}`)
     );
-    socket.write(buildCommand(device.id, "L0"));
     return true;
   }
   return false;
