@@ -95,7 +95,7 @@ function listenDevice(deviceData, socket) {
   // update details on existing device
   // set the status as online automatically
   const deviceDetails = byteToString(deviceData);
-  const deviceId = deviceDetails.split(",")[2];
+  const deviceId = "863957074480911";
   const command = deviceDetails.split(",")[3];
   console.log("Device Details:", deviceDetails);
 
