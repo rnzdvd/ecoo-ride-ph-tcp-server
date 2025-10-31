@@ -158,6 +158,7 @@ function listenDevice(deviceData, socket) {
         `${operationKey},${userId},${getCurrentTimestamp()}`
       )
     );
+    socket.write(buildCommand(deviceId, "L0"));
   }
 }
 
