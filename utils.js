@@ -39,7 +39,7 @@ function checkIfDeviceIsExisting(devices, id) {
 }
 
 function getCurrentTimestamp() {
-  return Date.now() / 1000;
+  return Math.floor(Date.now() / 1000);
 }
 
 module.exports = {
