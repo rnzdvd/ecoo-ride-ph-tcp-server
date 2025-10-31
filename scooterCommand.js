@@ -3,9 +3,9 @@ function buildCommand(imei, instructionType, payload) {
   var body = "";
   // Build ASCII body
   if (payload) {
-    body = `*SCOS,${vendorCode},${imei},${instructionType},${payload}#`;
+    body = `*SCOS,${vendorCode},${imei},${instructionType},${payload}`;
   } else {
-    body = `*SCOS,${vendorCode},${imei},${instructionType}#`;
+    body = `*SCOS,${vendorCode},${imei},${instructionType}`;
   }
   // // Build final packet: FF FF (header) + body + newline
   // const header = Buffer.from([0xff, 0xff]);
