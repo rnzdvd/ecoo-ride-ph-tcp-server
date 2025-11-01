@@ -33,7 +33,7 @@ function printPacket(packet) {
 
 function getSendOrder(body) {
   // command
-  let order = `${body}#\r\n`;
+  let order = `${body}#\n`.toString("utf-8");
   // 添加 0xFF, 0xFF
   return addByte([0xff, 0xff], order);
 }

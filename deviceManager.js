@@ -97,7 +97,6 @@ function listenDevice(deviceData, socket) {
   const deviceDetails = byteToString(deviceData);
   const deviceId = deviceDetails.split(",")[2];
   const command = deviceDetails.split(",")[3];
-  console.log("Device Details:", deviceDetails);
 
   // Ensure socket has a UUID
   if (!socket.id) {
@@ -105,7 +104,10 @@ function listenDevice(deviceData, socket) {
     console.log(`Assigned socket ID for ${deviceId}: ${socket.id}`);
   }
 
-  if (command === "L5") {
+  console.log("Scooter Response:", deviceDetails);
+
+  // handle the heart beat command
+  if (command === "H0") {
     const existing = getDeviceById(deviceId);
     if (!existing) {
       const newDevice = {
