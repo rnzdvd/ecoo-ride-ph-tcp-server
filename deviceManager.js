@@ -96,7 +96,7 @@ function listenDevice(deviceData, socket) {
   // set the status as online automatically
   // 863957074480911
   const deviceDetails = byteToString(deviceData);
-  const deviceId = "863957074480911";
+  const deviceId = deviceDetails.split(",")[2];
   const command = deviceDetails.split(",")[3];
 
   // Ensure socket has a UUID
@@ -162,6 +162,7 @@ function listenDevice(deviceData, socket) {
       )
     );
   } else if (command === "L0") {
+    // for verification of lock/unlock scooter
     socket.write(buildCommand(deviceId, "L0"));
   }
 }
