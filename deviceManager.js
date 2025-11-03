@@ -161,6 +161,7 @@ function listenDevice(deviceData, socket) {
         `${operationKey},${userId},${getCurrentTimestamp()}`
       )
     );
+  } else if (command === "L0") {
     socket.write(buildCommand(deviceId, "L0"));
   }
 }
