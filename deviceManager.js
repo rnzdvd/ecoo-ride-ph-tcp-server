@@ -134,9 +134,8 @@ function listenDevice(deviceData, socket) {
         location: { lat: null, lng: null },
       };
       addNewDevice(newDevice);
+      socket.write(buildCommand(deviceId, "D1", "10")); // set frequency on interval for sending location
       console.log(`🟢 New device added: ${newDevice.name}`);
-      // set location frequency here
-      //
     } else {
       existing.status = "online";
       existing.socket = socket;
