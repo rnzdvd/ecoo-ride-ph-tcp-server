@@ -154,16 +154,27 @@ function listenDevice(deviceData, socket) {
     // unlock the command for lock/unlock scooter
     const operationKey = deviceDetails.split(",")[5];
     const userId = deviceDetails.split(",")[6];
-    socket.write(
-      buildCommand(
-        deviceId,
-        "L0",
-        `${operationKey},${userId},${getCurrentTimestamp()}`
-      )
-    );
+    const operation = deviceDetails.split(",")[4];
+
+    if (operation === "0") {
+      // unlocking scooter
+      socket.write(
+        buildCommand(
+          deviceId,
+          "L0",
+          `${operationKey},${userId},${getCurrentTimestamp()}`
+        )
+      );
+    } else {
+      // locking scooter
+      socket.write(buildCommand(deviceId, "L1", `${operationKey}`));
+    }
   } else if (command === "L0") {
-    // for verification of lock/unlock scooter
+    // for verification for unlocking scooter
     socket.write(buildCommand(deviceId, "L0"));
+  } else if (command === "L1") {
+    // for verification for locking scooter
+    socket.write(buildCommand(deviceId, "L1"));
   }
 }
 
