@@ -61,6 +61,16 @@ function updateDeviceBattery(id, batteryLevel, socket, lastSeen) {
   }
 }
 
+function updateDeviceLockedStatus(id, lockedStatus, socket, lastSeen) {
+  const device = devices.find((d) => d.id === id);
+  if (device) {
+    device.is_locked = lockedStatus;
+    device.socket = socket;
+    device.lastSeen = lastSeen;
+    device.socketId = socket.id;
+  }
+}
+
 function addNewDevice(device) {
   devices.push(device);
 }
@@ -110,6 +120,7 @@ function listenDevice(deviceData, socket) {
   // handle the heart beat command
   if (command === "H0") {
     const existing = getDeviceById(deviceId);
+    const status = deviceDetails.split(",")[4];
     if (!existing) {
       const newDevice = {
         id: deviceId,
@@ -119,10 +130,13 @@ function listenDevice(deviceData, socket) {
         lastSeen: getCurrentTimestamp(),
         battery: null,
         socketId: socket.id,
+        is_locked: status !== "0",
         location: { lat: null, lng: null },
       };
       addNewDevice(newDevice);
       console.log(`🟢 New device added: ${newDevice.name}`);
+      // set location frequency here
+      //
     } else {
       existing.status = "online";
       existing.socket = socket;
@@ -172,9 +186,11 @@ function listenDevice(deviceData, socket) {
   } else if (command === "L0") {
     // for verification for unlocking scooter
     socket.write(buildCommand(deviceId, "L0"));
+    updateDeviceLockedStatus(deviceId, false, socket, getCurrentTimestamp());
   } else if (command === "L1") {
     // for verification for locking scooter
     socket.write(buildCommand(deviceId, "L1"));
+    updateDeviceLockedStatus(deviceId, true, socket, getCurrentTimestamp());
   }
 }
 

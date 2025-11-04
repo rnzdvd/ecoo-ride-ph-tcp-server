@@ -44,8 +44,7 @@ setInterval(() => {
     const jitter = Math.random() * 500; // 0–0.5s random delay
     setTimeout(() => {
       if (d.socket && d.status === "online") {
-        // d.socket.write(buildCommand(d.id, "S6")); // Battery level
-        // d.socket.write(buildCommand(d.id, "D1", "10")); // Location update
+        d.socket.write(buildCommand(d.id, "S6")); // Battery level
       }
     }, i * delayPerDevice + jitter);
   });
